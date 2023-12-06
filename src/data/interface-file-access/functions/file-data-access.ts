@@ -50,7 +50,8 @@ export async function makeXMLOutputDirectory(): Promise<void> {
 }
 
 export function xmlOutputDirectory(): string {
-	return `${configuration.modPath} (Patched)/gamedata/configs/ui`
+	const outputPath = configuration.modPath.replace("Input", "Output")
+	return `${outputPath}/gamedata/configs/ui`
 }
 
 export async function writeXMLFile(path: string, contents: string): Promise<void> {
