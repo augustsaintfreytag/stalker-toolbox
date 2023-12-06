@@ -1,6 +1,6 @@
 export const configuration = {
 	encoding: "windows1252", // Currently ignored
-	modPath: "E:/Steam/steamapps/common/Stalker GAMMA MO2/mods/ZZZ- Custom UI Patch",
+	modPath: "E:/Steam/steamapps/common/Stalker GAMMA MO2/mods/ZZZ- Saint's Custom UI Patcher Input",
 	modUserInterfaceFilePatterns: [
 		"actor_menu",
 		"message_box",
@@ -16,7 +16,7 @@ export const configuration = {
 		"ui_options",
 		"ui_workshop"
 	],
-	modUserInterfaceLooseElements: [],
+	modUserInterfaceElementPatterns: ["button", "btn", "cap", "list", "block", "caption", "rank", "name", "community", "money", "weight", "price"],
 	modUserInterfaceFileEnding: "xml",
 	lineHeightByFont: {
 		graffiti22: 24,
