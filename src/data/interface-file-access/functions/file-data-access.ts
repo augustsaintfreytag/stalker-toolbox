@@ -29,6 +29,16 @@ export async function readXMLFile(entry: FileEntry): Promise<FileContents> {
 	}
 }
 
+export async function truncateXMLOutputDirectory(): Promise<void> {
+	const outputPath = xmlOutputDirectory()
+
+	try {
+		await fs.removeDir(outputPath, { recursive: true })
+	} catch (error) {
+		throw new Error(`Could not truncate output directory at path '${outputPath}'. ${error}`)
+	}
+}
+
 export async function makeXMLOutputDirectory(): Promise<void> {
 	const outputPath = xmlOutputDirectory()
 
