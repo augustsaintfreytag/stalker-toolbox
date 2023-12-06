@@ -3,6 +3,7 @@ import {
 	listXMLFiles,
 	makeXMLOutputDirectory,
 	readXMLFile,
+	truncateXMLOutputDirectory,
 	writeXMLFile,
 	xmlOutputDirectory
 } from "~/data/interface-file-access/functions/file-data-access"
@@ -10,13 +11,14 @@ import {
 const defaultButtonElementHeight = 26
 
 export async function processAllInterfaceFiles(): Promise<void> {
+	;``
 	const allFileEntries = await listXMLFiles()
 	const allProcessedFileContents: [string, string][] = []
 
-	console.log(`(Process) Read ${allFileEntries.length} user interface files from mod directory.`)
+	console.log(`(Process) Read ${allFileEntries.length} user interface file(s) from mod directory.`)
 
 	for (const fileEntry of allFileEntries) {
-		console.log(`(Process) Processing ${fileEntry.name}...`)
+		console.log(`(Process) Processing file '${fileEntry.name}'.`)
 		const fileName = fileEntry.name ?? "(Unknown File)"
 		const rawFileContents = await readXMLFile(fileEntry)
 		const processedFileContents = processInterfaceFileContents(fileName, rawFileContents)
@@ -24,13 +26,16 @@ export async function processAllInterfaceFiles(): Promise<void> {
 		allProcessedFileContents.push([fileName, processedFileContents])
 	}
 
-	console.log(`(Process) Writing ${allProcessedFileContents.length} user interface files to output directory.`)
+	const outputDirectory = xmlOutputDirectory()
 
+	console.log(`(Process) Writing ${allProcessedFileContents.length} user interface file(s) to output directory '${outputDirectory}'.`)
+
+	await truncateXMLOutputDirectory()
 	await makeXMLOutputDirectory()
 
 	for (const [fileName, fileContents] of allProcessedFileContents) {
 		try {
-			const filePath = `${xmlOutputDirectory()}/${fileName}`
+			const filePath = `${outputDirectory}/${fileName}`
 			await writeXMLFile(filePath, fileContents)
 		} catch (error) {
 			console.error(`(Process) Could not write file '${fileName}' to output directory. ${error}`)
@@ -43,7 +48,7 @@ export function processInterfaceFileContents(fileName: string, fileContents: str
 	const buttonParentElements = getButtonParentElements(document.documentElement)
 
 	for (const buttonParentElement of buttonParentElements) {
-		processButtonElement(fileName, buttonParentElement)
+		processButtonElementWithVerticalAlignment(fileName, buttonParentElement)
 	}
 
 	return new XMLSerializer().serializeToString(document)
@@ -51,11 +56,10 @@ export function processInterfaceFileContents(fileName: string, fileContents: str
 
 // Process
 
-function processButtonElement(fileName: string, buttonElement: Element): void {
+function processButtonElementWithEstimatedHeight(fileName: string, buttonElement: Element): void {
 	const textElement = buttonElement.querySelector("text")
 
 	if (!textElement) {
-		// console.log(`Skipped processing button element '${buttonElement.nodeName}' in '${fileName}', no text element.`)
 		return
 	}
 
@@ -79,7 +83,21 @@ function processButtonElement(fileName: string, buttonElement: Element): void {
 	const verticalOffset = (buttonHeight - lineHeight) / 2
 
 	textElement.setAttribute("y", String(verticalOffset))
-	console.log(`Assigned vertical offset ${verticalOffset} to button element '${buttonElement.nodeName}' in '${fileName}'.`)
+
+	console.log(`Assigned vertical offset ${verticalOffset} to text in button element '${buttonElement.nodeName}' in '${fileName}'.`)
+}
+
+function processButtonElementWithVerticalAlignment(fileName: string, buttonElement: Element): void {
+	const textElement = buttonElement.querySelector("text")
+
+	if (!textElement) {
+		return
+	}
+
+	textElement.setAttribute("vert_align", "c")
+	textElement.setAttribute("complex_mode", "1")
+
+	console.log(`Assigned layout attributes to text in button element '${buttonElement.nodeName}' in '${fileName}'.`)
 }
 
 function lineHeightForFontIdentifier(fontIdentifier: string): number | undefined {
@@ -89,6 +107,8 @@ function lineHeightForFontIdentifier(fontIdentifier: string): number | undefined
 
 // Read & Extract
 
+const tagNameMatchExpression = new RegExp(`(${configuration.modUserInterfaceElementPatterns.join("|")})`, "i")
+
 function getButtonParentElements(rootElement: Element): Element[] {
 	const buttonParentElements: Element[] = []
 
@@ -97,7 +117,7 @@ function getButtonParentElements(rootElement: Element): Element[] {
 			continue
 		}
 
-		if (node.tagName.match(/(button|btn|cap|list)/gi)) {
+		if (tagNameMatchExpression.test(node.tagName)) {
 			buttonParentElements.push(node)
 		} else if (node.hasChildNodes()) {
 			const childButtonParentElements = getButtonParentElements(node)
