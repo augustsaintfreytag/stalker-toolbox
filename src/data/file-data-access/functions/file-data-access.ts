@@ -1,14 +1,14 @@
 import { fs } from "@tauri-apps/api"
 import { FileEntry } from "@tauri-apps/api/fs"
 import { configuration } from "~/data/configuration/configuration"
+import { Path } from "~/data/file-data-access/library/path"
 
 export type FileContents = string
 
 const fileMatchExpressions = configuration.modUserInterfaceFilePatterns.map(pattern => new RegExp(pattern, "i"))
 
-export async function listXMLFiles(): Promise<FileEntry[]> {
-	const path = `${configuration.modPath}/gamedata/configs/ui`
-	const files = await fs.readDir(path)
+export async function listXMLFiles(directory: Path): Promise<FileEntry[]> {
+	const files = await fs.readDir(directory)
 
 	return files.filter(file => {
 		const name = file.name
@@ -29,29 +29,20 @@ export async function readXMLFile(entry: FileEntry): Promise<FileContents> {
 	}
 }
 
-export async function truncateXMLOutputDirectory(): Promise<void> {
-	const outputPath = xmlOutputDirectory()
-
+export async function truncateXMLOutputDirectory(directory: Path): Promise<void> {
 	try {
-		await fs.removeDir(outputPath, { recursive: true })
+		await fs.removeDir(directory, { recursive: true })
 	} catch (error) {
-		throw new Error(`Could not truncate output directory at path '${outputPath}'. ${error}`)
+		throw new Error(`Could not truncate output directory at path '${directory}'. ${error}`)
 	}
 }
 
-export async function makeXMLOutputDirectory(): Promise<void> {
-	const outputPath = xmlOutputDirectory()
-
+export async function makeXMLOutputDirectory(directory: Path): Promise<void> {
 	try {
-		await fs.createDir(outputPath, { recursive: true })
+		await fs.createDir(directory, { recursive: true })
 	} catch (error) {
-		throw new Error(`Could not create output directory at path '${outputPath}'. ${error}`)
+		throw new Error(`Could not create output directory at path '${directory}'. ${error}`)
 	}
-}
-
-export function xmlOutputDirectory(): string {
-	const outputPath = configuration.modPath.replace("Input", "Output")
-	return `${outputPath}/gamedata/configs/ui`
 }
 
 export async function writeXMLFile(path: string, contents: string): Promise<void> {
