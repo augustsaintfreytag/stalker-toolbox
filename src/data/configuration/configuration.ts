@@ -18,8 +18,15 @@ export const configuration = {
 	],
 	modUserInterfaceElementPatterns: ["button", "btn", "cap", "list", "block", "caption", "rank", "name", "community", "money", "weight", "price"],
 	modUserInterfaceFileEnding: "xml",
-	modUserInterfaceCustomVerticalOffset: {},
-	modUserInterfaceCustomValueOverrides: {},
+	modUserInterfaceCustomVerticalOffset: {
+		"ui_options_16:btn_accept": -1,
+		"ui_options_16:btn_reset": -1,
+		"ui_options_16:btn_default": -1,
+		"ui_options_16:btn_cancel": -1
+	},
+	modUserInterfaceCustomValueOverrides: {
+		"ui_mm_main_16:shniaga_wnd > shniaga > magnifire > y_offset": -7
+	},
 	lineHeightByFont: {
 		graffiti22: 24,
 		letterica18: 20,
