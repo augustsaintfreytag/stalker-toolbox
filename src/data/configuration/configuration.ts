@@ -18,6 +18,8 @@ export const configuration = {
 	],
 	modUserInterfaceElementPatterns: ["button", "btn", "cap", "list", "block", "caption", "rank", "name", "community", "money", "weight", "price"],
 	modUserInterfaceFileEnding: "xml",
+	modUserInterfaceCustomVerticalOffset: {},
+	modUserInterfaceCustomValueOverrides: {},
 	lineHeightByFont: {
 		graffiti22: 24,
 		letterica18: 20,
